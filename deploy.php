@@ -4,10 +4,10 @@ namespace Deployer;
 require 'recipe/laravel.php';
 
 // Project name
-set('application', 'my_project');
+set('application', 'desplegar_laravel');
 
 // Project repository
-set('repository', 'git@domain.com:username/repository.git');
+set('repository', 'git@github.com:Pafloca/todo-laravel.git');
 
 // [Optional] Allocate tty for git clone. Default value is false.
 set('git_tty', true); 
@@ -22,8 +22,10 @@ add('writable_dirs', []);
 
 // Hosts
 
-host('project.com')
-    ->set('deploy_path', '~/{{application}}');    
+host('192.168.56.102')
+    ->user('ddaw-ud4-deployer')
+    ->identityFile('~/.ssh/id_rsa.pub')
+    ->set('deploy_path', '/var/www/prod-ud4-a4/html'); 
     
 // Tasks
 
@@ -38,3 +40,8 @@ after('deploy:failed', 'deploy:unlock');
 
 before('deploy:symlink', 'artisan:migrate');
 
+task('reload:php-fpm', function () {
+ run('sudo /etc/init.d/php8.1-fpm restart');
+});
+
+after('deploy', 'reload:php-fpm');
